@@ -1,0 +1,126 @@
+# Import necessary modules
+from flask import Flask, request, jsonify   # Flask for web app, request for input, jsonify for output
+from flask_cors import CORS                 # Enables Cross-Origin Resource Sharing (for frontend/backend interaction)
+
+app = Flask(_name_)  # Initialize Flask app
+CORS(app)              # Allow frontend (HTML/JS) to connect to backend API
+
+# Define a route for calculation
+@app.route('/calculate', methods=['POST'])  # Accept only POST requests
+def calculate():
+    data = request.get_json()              # Get JSON data from frontend
+    num1 = data['num1']
+    num2 = data['num2']
+    operation = data['operation']          # e.g., 'add', 'subtract', etc.
+
+    # Perform the operation
+    if operation == 'add':
+        result = num1 + num2
+    elif operation == 'subtract':
+        result = num1 - num2
+    elif operation == 'multiply':
+        result = num1 * num2
+    elif operation == 'divide':
+        if num2 == 0:
+            return jsonify({"error": "Cannot divide by zero"}), 400
+        result = num1 / num2
+    else:
+        return jsonify({"error": "Invalid operation"}), 400
+
+    return jsonify({"result": result})  # Send result back as JSON
+
+# Run the Flask app
+if _name_ == '_main_':
+    app.run(debug=True)  # Runs on http://localhost:5000
+-------HTML, CSS, JAVA SCRIPT(FROTENDED LANGUAGES)----------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Calculator</title>
+    <style>
+        /* Styling for layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .calculator {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 300px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <h2>Simple Calculator</h2>
+
+    <!-- Number inputs -->
+    <input type="number" id="num1" placeholder="Enter first number">
+    <input type="number" id="num2" placeholder="Enter second number">
+
+    <!-- Operation selection -->
+    <select id="operation">
+        <option value="add">Addition (+)</option>
+        <option value="subtract">Subtraction (-)</option>
+        <option value="multiply">Multiplication (×)</option>
+        <option value="divide">Division (÷)</option>
+    </select>
+
+    <!-- Submit button -->
+    <button onclick="calculate()">Calculate</button>
+
+    <!-- Result display -->
+    <div id="result">Result: </div>
+</div>
+
+<!-- JavaScript to handle calculation -->
+<script>
+function calculate() {
+    const num1 = parseFloat(document.getElementById('num1').value);  // Get input 1
+    const num2 = parseFloat(document.getElementById('num2').value);  // Get input 2
+    const operation = document.getElementById('operation').value;    // Get selected operation
+
+    // Send POST request to Flask backend
+    fetch('http://localhost:5000/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ num1, num2, operation })  // Send numbers and operation
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result !== undefined) {
+            document.getElementById('result').innerText = Result: ${data.result};
+        } else {
+            document.getElementById('result').innerText = Error: ${data.error};
+        }
+    })
+    .catch(error => {
+        document.getElementById('result').innerText = 'Error: Cannot connect to server';
+        console.error('Error:', error);
+    });
+}
+</script>
+
+</body>
+</html>
